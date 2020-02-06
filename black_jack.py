@@ -19,6 +19,16 @@ class Card:
         return '%s %s' % (self.label, self.color)
 
 
+class Hand:
+    def __init__(self):
+        self.cards = []
+    def __str__(self):
+        return '\n' + ', '.join([str(card) for card in self.cards])
+
+    def add_card(self, card): 
+        self.cards.append(card)
+    def remove_card(self, card):
+        self.cards.remove(card)       
 
 
 class Deck:
