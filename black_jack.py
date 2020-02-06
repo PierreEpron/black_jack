@@ -18,3 +18,16 @@ class Card:
     def __str__(self):
         return '%s %s' % (self.label, self.color)
 
+
+class Deck:
+    def __init__(self, base_deck, colors):
+        self.base_deck = base_deck
+        self.colors = colors
+        self.create()
+    def __str__(self):
+        return '\n' + ', '.join([str(card) for card in self.deck])
+
+    def create(self):
+        self.deck = [Card(card[0], color, card[1]) for color in self.colors for card in self.base_deck]
+
+
