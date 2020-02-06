@@ -45,6 +45,10 @@ class Deck:
         self.cards = [Card(card[0], color, card[1]) for color in self.colors for card in self.base_deck]
     def shuffle(self):
         random.shuffle(self.cards)
-
-                
+    def draw_hands(self, hands, card_count=2):
+        for i in range(0, card_count):
+            for hand in hands:
+                hand.add_card(self.draw_card())
+    def draw_card(self):
+        return self.cards.pop()
 
