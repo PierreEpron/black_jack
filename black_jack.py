@@ -2,7 +2,7 @@
 
 import random
 
-COLORS = ['Heart', 'Tile', 'Clover', 'Pike']
+COLORS = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
 BASE_DECK = [
     ('2', 2), ('3', 3), ('4', 4), ('5', 6),
     ('6', 6), ('7', 7), ('8', 8), ('9', 9),
