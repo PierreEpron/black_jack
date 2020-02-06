@@ -3,6 +3,8 @@
 import random
 
 
+random.seed(1)
+
 AS = 'A'
 COLORS = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
 BASE_DECK = [
@@ -11,11 +13,26 @@ BASE_DECK = [
     ('10', 10), ('J', 10), ('Q', 10), 
     ('K', 10), (AS, 1)
 ]
-BLACK_JACK = 21 
 
-LOOSE = 0
-WIN = 1
-NOTHING = 2
+BLACK_JACK = 21 
+DEALER_MAX = 17
+
+LOOSING = 0
+WINNING = 1
+PLAYING = 2
+WAITING = 3
+PASSING = 4
+DRAWING = 5
+
+MSG = [''] * 6
+
+MSG[LOOSING] = 'has lost :\'('
+MSG[WINNING] = 'has won :)'
+MSG[PLAYING] = 'is playing'
+MSG[WAITING] = 'wait his turn to play'
+MSG[PASSING] = 'has passed'
+MSG[DRAWING] = 'has draw with dealer'
+
 
 def clear(c = 10):
     print('\n' * c)    
@@ -94,44 +111,84 @@ class Actor:
     def __init__(self):
         self.hand = Hand()
         self.name = ''
-        self.state = NOTHING
-    def __str__(self):
-        return '%s : %s -> %s' % (self.name, self.hand, self.state)
+        self.state = WAITING
     def check_black_jack(self):
         if self.hand.get_best_points() == BLACK_JACK:
             return True
         return False
     def win(self):
         print('%s a gagné' % (self.name))
-
-
+        
 class HumanPlayer(Actor):
     def __init__(self, name):
         Actor.__init__(self)
         self.name = name
-
+    def __str__(self):
+        return '%s : %s || %s' % (self.name, self.hand, MSG[self.state])
+    
+    def play(self, game):
+        game.show()
+        entry = self.get_entry()
+        while entry != 'p':
+            self.hand.add_card(game.deck.draw_card())
+            game.show()
+            if self.hand.get_best_points() > BLACK_JACK:
+                entry = 'p'
+                self.state = LOOSING
+            else:
+                entry = self.get_entry()
+        if self.state == WAITING:
+            self.state = PASSING
+    def get_entry(self):
+        entry = None
+        while entry == None or (entry != 'd' and entry != 'p'):
+            entry = input('\n%s, do you want draw or pass ? (d/p)' % self.name)
+        return entry
 
 class Dealer(Actor):
     def __init__(self):
         Actor.__init__(self)
         self.name = 'Dealer'
-        
+    def __str__(self):
+        return '%s : %s' % (self.name, self.hand)  
+    def play(self, game):
+        while self.hand.get_best_points() < DEALER_MAX:
+            self.hand.add_card(game.deck.draw_card())
+            game.show()
+
+        if self.hand.get_best_points() > BLACK_JACK:
+            for player in game.players:
+                if player.state == PASSING:
+                    player.state = WINNING
+        else:
+            for player in game.players:
+                if player.state == PASSING:
+                    if self.hand.get_best_points() < player.hand.get_best_points():
+                        player.state = WINNING
+                    elif self.hand.get_best_points() == player.hand.get_best_points():
+                        player.state = DRAWING
+                    else:
+                        player.state = LOOSING
+        game.show()
+
 
 class Game:
     def __init__(self):
         self.deck = Deck(BASE_DECK, COLORS)
         self.actors = []
         self.players = []
-    
     def start(self, player_count = 2):
         self.create_players(player_count)
         self.create_dealer()
         self.deal()
         self.show()
         self.check_black_jacks()
+        if self.dealer.state != WINNING:
+            self.play()
+
     def play(self):
-        for actor in actors:
-            print(actor.name)
+        for actor in self.actors:
+            actor.play(self)
 
     def create_dealer(self):
         self.dealer = Dealer()
@@ -152,11 +209,13 @@ class Game:
         self.deck.draw_hands([actor.hand for actor in self.actors])
     def check_black_jacks(self):
         if self.dealer.check_black_jack():
-            self.dealer.win()
-            return
+            self.dealer.state = WINNING
         for player in self.players:
             if player.check_black_jack():
-                player.win()
+                if self.dealer.state == WINNING:
+                    player.state = PASSING
+                else:
+                    player.state = WINNING
     def show(self):
         clear()
         print('\n\n'.join([str(actor) for actor in self.actors]))
