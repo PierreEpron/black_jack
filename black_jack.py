@@ -66,6 +66,8 @@ class Hand:
             if min == None or min > point:
                 min = point
         return min
+
+
 class Deck:
     def __init__(self, base_deck, colors, shuffle=True):
         self.base_deck = base_deck
@@ -96,8 +98,12 @@ class Actor:
     def __str__(self):
         return '%s : %s -> %s' % (self.name, self.hand, self.state)
     def check_black_jack(self):
-        if BLACK_JACK == self.hand.get_best_points():
-            self.state = WIN
+        if self.hand.get_best_points() == BLACK_JACK:
+            return True
+        return False
+    def win(self):
+        print('%s a gagné' % (self.name))
+
 
 class HumanPlayer(Actor):
     def __init__(self, name):
@@ -116,13 +122,17 @@ class Game:
         self.deck = Deck(BASE_DECK, COLORS)
         self.actors = []
         self.players = []
-
+    
     def start(self, player_count = 2):
-        self.create_dealer()
         self.create_players(player_count)
-        self.first_deal()
-        self.check_black_jacks()
+        self.create_dealer()
+        self.deal()
         self.show()
+        self.check_black_jacks()
+    def play(self):
+        for actor in actors:
+            print(actor.name)
+
     def create_dealer(self):
         self.dealer = Dealer()
         self.actors.append(self.dealer)
@@ -138,12 +148,15 @@ class Game:
         p = HumanPlayer(name)
         self.players.append(p)
         self.actors.append(p)
-    def first_deal(self):
+    def deal(self):
         self.deck.draw_hands([actor.hand for actor in self.actors])
     def check_black_jacks(self):
-        for actor in self.actors:
-            actor.check_black_jack()
-
+        if self.dealer.check_black_jack():
+            self.dealer.win()
+            return
+        for player in self.players:
+            if player.check_black_jack():
+                player.win()
     def show(self):
         clear()
         print('\n\n'.join([str(actor) for actor in self.actors]))
