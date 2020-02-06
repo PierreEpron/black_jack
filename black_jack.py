@@ -11,6 +11,9 @@ BASE_DECK = [
     ('K', 10), (AS, 11)
 ]
 
+def clear(c = 10):
+    print('\n' * c)    
+
 class Card:
     def __init__(self, label, color, value):
         self.label = label
@@ -86,11 +89,13 @@ class Dealer(Actor):
 class Game:
     def __init__(self):
         self.deck = Deck(BASE_DECK, COLORS)
+    
     def start(self, player_count = 2):
         self.actors = []
         self.create_dealer()
         self.create_players(player_count)
         self.first_deal()
+        self.show()
     def create_dealer(self):
         self.dealer = Dealer()
         self.actors.append(self.dealer)
@@ -104,7 +109,9 @@ class Game:
         name = ''
         while confirm != 'y':
             name = input('%s player to choose a name : ' % (id+1))
-            confirm = input('Are u sure to choose this name ? (y/*)')
+            confirm = input('Your name is %s ? (y/*)' % name)
         self.players.append(HumanPlayer(name))
     def first_deal(self):
         self.deck.draw_hands([actor.hand for actor in self.actors])
+    def show(self):
+        print('\n\n'.join(['%s : %s - %s' % (actor.name, actor.hand, actor.hand.get_points())for actor in self.actors]))
