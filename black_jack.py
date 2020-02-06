@@ -71,25 +71,40 @@ class Deck:
 class Actor:
     def __init__(self):
         self.hand = Hand()
-
+        self.name = ''
 
 class HumanPlayer(Actor):
-    def __init__(self):
+    def __init__(self, name):
         Actor.__init__(self)
-
+        self.name = name
 
 class Dealer(Actor):
     def __init__(self):
         Actor.__init__(self)
-
+        self.name = 'Dealer'
 
 class Game:
     def __init__(self):
         self.deck = Deck(BASE_DECK, COLORS)
-        self.dealer = Dealer()
-        self.player = HumanPlayer()
-
-    def start(self):
+    def start(self, player_count = 2):
+        self.actors = []
+        self.create_dealer()
+        self.create_players(player_count)
         self.first_deal()
+    def create_dealer(self):
+        self.dealer = Dealer()
+        self.actors.append(self.dealer)
+    def create_players(self, player_count):
+        self.players = []
+        for i in range(0, player_count):
+            self.create_player(i)
+        self.actors.extend(self.players)            
+    def create_player(self, id):
+        confirm = ''
+        name = ''
+        while confirm != 'y':
+            name = input('%s player to choose a name : ' % (id+1))
+            confirm = input('Are u sure to choose this name ? (y/*)')
+        self.players.append(HumanPlayer(name))
     def first_deal(self):
-        self.deck.draw_hands((self.dealer.hand, self.player.hand))
+        self.deck.draw_hands([actor.hand for actor in self.actors])
