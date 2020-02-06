@@ -29,5 +29,7 @@ class Deck:
 
     def create(self):
         self.deck = [Card(card[0], color, card[1]) for color in self.colors for card in self.base_deck]
+    def shuffle(self):
+        random.shuffle(self.deck)
 
 
