@@ -2,12 +2,13 @@
 
 import random
 
+AS = 'A'
 COLORS = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
 BASE_DECK = [
     ('2', 2), ('3', 3), ('4', 4), ('5', 6),
     ('6', 6), ('7', 7), ('8', 8), ('9', 9),
     ('10', 10), ('V', 10), ('Q', 10), 
-    ('K', 10), ('A', 11)
+    ('K', 10), (AS, 11)
 ]
 
 class Card:
@@ -17,6 +18,14 @@ class Card:
         self.value = value
     def __str__(self):
         return '%s %s' % (self.label, self.color)
+
+    def get_points(self):
+        if self.label != AS:
+            return self.value
+        v = None
+        while v != '11' and v != '1':
+            v = input('Do u want value ur As 1 or 11 ? (1/11)')
+        return (int)(v)
 
 
 class Hand:
@@ -32,9 +41,9 @@ class Hand:
     def get_points(self):
         points = 0
         for card in self.cards:
-            points += card.value
+            points += card.get_points()
         return points
-
+        
 
 class Deck:
     def __init__(self, base_deck, colors, shuffle=True):
