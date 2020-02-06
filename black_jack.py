@@ -8,7 +8,7 @@ BASE_DECK = [
     ('2', 2), ('3', 3), ('4', 4), ('5', 6),
     ('6', 6), ('7', 7), ('8', 8), ('9', 9),
     ('10', 10), ('V', 10), ('Q', 10), 
-    ('K', 10), (AS, 11)
+    ('K', 10), (AS, 1)
 ]
 
 def clear(c = 10):
@@ -23,28 +23,28 @@ class Card:
         return '%s %s' % (self.label, self.color)
 
     def get_points(self):
-        if self.label != AS:
-            return self.value
-        v = None
-        while v != '11' and v != '1':
-            v = input('Do u want value ur As 1 or 11 ? (1/11)')
-        return (int)(v)
+         return self.value
 
 
 class Hand:
     def __init__(self):
         self.cards = []
     def __str__(self):
-        return '\n' + ', '.join([str(card) for card in self.cards])
+        return '%s : %s' % (
+            ', '.join([str(card) for card in self.cards]), 
+            ', '.join([str(point) for point in self.get_points()]))
 
     def add_card(self, card): 
         self.cards.append(card)
     def remove_card(self, card):
         self.cards.remove(card)       
     def get_points(self):
-        points = 0
+        points = [0]
         for card in self.cards:
-            points += card.get_points()
+            for i in range(0, len(points)):
+                points[i] += card.get_points()
+            if card.label == AS:
+                points.append(points[-1] + 10)
         return points
 
 
@@ -75,11 +75,15 @@ class Actor:
     def __init__(self):
         self.hand = Hand()
         self.name = ''
+    def __str__(self):
+        return '%s : %s' % (self.name, self.hand)
+
 
 class HumanPlayer(Actor):
     def __init__(self, name):
         Actor.__init__(self)
         self.name = name
+
 
 class Dealer(Actor):
     def __init__(self):
@@ -114,4 +118,4 @@ class Game:
     def first_deal(self):
         self.deck.draw_hands([actor.hand for actor in self.actors])
     def show(self):
-        print('\n\n'.join(['%s : %s - %s' % (actor.name, actor.hand, actor.hand.get_points())for actor in self.actors]))
+        print('\n\n'.join([str(actor) for actor in self.actors]))
