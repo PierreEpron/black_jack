@@ -29,6 +29,11 @@ class Hand:
         self.cards.append(card)
     def remove_card(self, card):
         self.cards.remove(card)       
+    def get_points(self):
+        points = 0
+        for card in self.cards:
+            points += card.value
+        return points
 
 
 class Deck:
