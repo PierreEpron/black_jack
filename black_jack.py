@@ -43,7 +43,8 @@ class Hand:
         for card in self.cards:
             points += card.get_points()
         return points
-        
+
+
 class Deck:
     def __init__(self, base_deck, colors, shuffle=True):
         self.base_deck = base_deck
@@ -80,3 +81,15 @@ class HumanPlayer(Actor):
 class Dealer(Actor):
     def __init__(self):
         Actor.__init__(self)
+
+
+class Game:
+    def __init__(self):
+        self.deck = Deck(BASE_DECK, COLORS)
+        self.dealer = Dealer()
+        self.player = HumanPlayer()
+
+    def start(self):
+        self.first_deal()
+    def first_deal(self):
+        self.deck.draw_hands((self.dealer.hand, self.player.hand))
